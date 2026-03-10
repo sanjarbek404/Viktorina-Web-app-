@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { CheckCircle2, XCircle, ArrowRight, Timer, AlertTriangle } from 'lucide-react';
+import { mockDb } from '../data/mockDb';
 
 interface Question {
   id: number;
@@ -30,11 +31,7 @@ export default function Quiz({ user }: { user: { id: number; username: string } 
 
   useEffect(() => {
     if (!id) return;
-    fetch(`/api/quizzes/${id}`)
-      .then(res => {
-        if (!res.ok) throw new Error('Viktorina topilmadi');
-        return res.json();
-      })
+    mockDb.getQuizById(id)
       .then(data => {
         setQuiz(data);
         setLoading(false);
@@ -87,16 +84,8 @@ export default function Quiz({ user }: { user: { id: number; username: string } 
     if (!quiz) return;
 
     try {
-      await fetch('/api/results', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userId: user.id,
-          quizId: quiz.id,
-          score: score + (selectedOption === quiz.questions[currentQuestionIndex].correct_option_index ? 1 : 0),
-          total: quiz.questions.length
-        })
-      });
+      const finalScore = score + (selectedOption === quiz.questions[currentQuestionIndex].correct_option_index ? 1 : 0);
+      await mockDb.saveResult(user.id, user.username, quiz.id, finalScore, quiz.questions.length);
       
       setTimeout(() => {
         navigate(`/result/${quiz.id}`);

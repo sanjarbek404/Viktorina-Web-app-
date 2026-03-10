@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Link } from 'react-router-dom';
 import { Play, BookOpen, Trophy, Clock } from 'lucide-react';
+import { mockDb } from '../data/mockDb';
 
 interface Quiz {
   id: number;
@@ -15,8 +16,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/api/quizzes')
-      .then(res => res.json())
+    mockDb.getQuizzes()
       .then(data => {
         setQuizzes(data);
         setLoading(false);
