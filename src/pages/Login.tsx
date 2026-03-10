@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { LogIn, UserPlus, AlertCircle } from 'lucide-react';
-import { mockDb } from '../data/mockDb';
 
 export default function Login({ onLogin }: { onLogin: (user: { id: number; username: string }) => void }) {
   const [isLogin, setIsLogin] = useState(true);
@@ -15,12 +14,19 @@ export default function Login({ onLogin }: { onLogin: (user: { id: number; usern
     setError('');
     setLoading(true);
 
+    const endpoint = isLogin ? '/api/auth/login' : '/api/auth/register';
+
     try {
-      let data;
-      if (isLogin) {
-        data = await mockDb.login(username, password);
-      } else {
-        data = await mockDb.register(username, password);
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Xatolik yuz berdi');
       }
       onLogin({ id: data.id, username: data.username });
     } catch (err: any) {

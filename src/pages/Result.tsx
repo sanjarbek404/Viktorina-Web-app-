@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { Trophy, Home, RotateCcw, Medal, Star } from 'lucide-react';
-import { mockDb } from '../data/mockDb';
 
 interface LeaderboardEntry {
   username: string;
@@ -18,7 +17,8 @@ export default function Result() {
 
   useEffect(() => {
     if (!id) return;
-    mockDb.getLeaderboard(id)
+    fetch(`/api/quizzes/${id}/leaderboard`)
+      .then(res => res.json())
       .then(data => {
         setLeaderboard(data);
         setLoading(false);
